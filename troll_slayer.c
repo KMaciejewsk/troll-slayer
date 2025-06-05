@@ -278,6 +278,7 @@ void ZycieZabojcyMPI(int rank_mpi) {
                     // wybierz najlepsze miasto do zaoferowania
                     int id_oferowanego_miasta_przez_mnie = -1;
                     int najlepszy_lokalny_zegar_dostepnosci = NIESKONCZONOSC;
+                    int najlepsza_odleglosc = M_MIAST + 1;
 
                     for (int m = 0; m < M_MIAST; ++m) {
                         int aktualny_zegar_dostep_m = (status_miasta[m] == ODPOCZYWA) ? miasto_odpoczywa_do_zegara[m] : zegar_lamporta;
@@ -285,19 +286,27 @@ void ZycieZabojcyMPI(int rank_mpi) {
                         if ((status_miasta[m] == WOLNE || (status_miasta[m] == ODPOCZYWA && aktualny_zegar_dostep_m < NIESKONCZONOSC)) &&
                             (status_miasta[m] != OCZEKUJE_NA_ACK_DLA_KONKRETNEGO || m != wybrane_miasto_do_REQ) &&
                             (status_miasta[m] != W_MIESCIE || m != wybrane_miasto_do_REQ)) {
-                            if (aktualny_zegar_dostep_m < najlepszy_lokalny_zegar_dostepnosci) {
-                                najlepszy_lokalny_zegar_dostepnosci = aktualny_zegar_dostep_m;
-                                id_oferowanego_miasta_przez_mnie = m;
-                            } else if (aktualny_zegar_dostep_m == najlepszy_lokalny_zegar_dostepnosci && m < id_oferowanego_miasta_przez_mnie) {
-                                id_oferowanego_miasta_przez_mnie = m;
+
+                            int odleglosc = abs(m - msg.id_nadawcy);
+
+                            if (aktualny_zegar_dostep_m < najlepszy_lokalny_zegar_dostepnosci ||
+                                (aktualny_zegar_dostep_m == najlepszy_lokalny_zegar_dostepnosci &&
+                                    odleglosc < najlepsza_odleglosc) ||
+                                (aktualny_zegar_dostep_m == najlepszy_lokalny_zegar_dostepnosci &&
+                                    odleglosc == najlepsza_odleglosc &&
+                                    m < id_oferowanego_miasta_przez_mnie)) {
+                                
+                                    najlepszy_lokalny_zegar_dostepnosci = aktualny_zegar_dostep_m;
+                                    id_oferowanego_miasta_przez_mnie = m;
+                                    najlepsza_odleglosc = odleglosc;
                             }
                         }
                     }
 
                     if (id_oferowanego_miasta_przez_mnie != -1) {
-                        WYSLIJ_DO(msg.id_nadawcy, OFFER_CITY_RESP, moj_rank_mpi, zegar_lamporta, id_oferowanego_miasta_przez_mnie, najlepszy_lokalny_zegar_dostepnosci);
+                        WYSLIJ_DO(msg.id_nadawcy, OFFER_CITY_RESP, moj_rank_mpi, zegar_lamporta,
+                                id_oferowanego_miasta_przez_mnie, najlepszy_lokalny_zegar_dostepnosci);
                     } else {
-                        // można wysłać pustą ofertę lub nic nie robić
                         WYPISZ_LOG(moj_rank_mpi, zegar_lamporta, "Nie mam dobrej oferty dla " + msg.id_nadawcy);
                     }
                     break;
