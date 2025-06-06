@@ -1,6 +1,8 @@
 #ifndef TROLL_SLAYER_H
 #define TROLL_SLAYER_H
 
+#include <unistd.h>
+
 // ----- stale globalne -----
 extern int N_ZABOJCOW;
 extern int M_MIAST;

@@ -1,6 +1,7 @@
 #include <mpi.h>
 #include "troll_slayer.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 int N_ZABOJCOW;
 int M_MIAST;
