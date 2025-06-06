@@ -10,3 +10,5 @@ Wymagania: W jednym mieście naraz może się znaleźć tylko jeden zabójca. Za
 Procesy działają z różną prędkością i niektóre mogą wręcz przez jakiś czas nie chcieć odwiedzać miast. Nie powinno to blokować pracy innych procesów.
 
 Projekt na trójkę: Zabójcy mogą się ubiegać osobno o każde miasto, miasta nie muszą odpoczywać po wizycie zabójcy.
+
+bash setup-mpi.txt --init
